@@ -1,0 +1,5 @@
+import '../entities/property.dart';
+
+abstract class PropertyRepository {
+  Future<List<Property>> getProperties(int hostId);
+}
