@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-/// Alineación horizontal del contenido de una celda en MapStayTable.
+
 enum MapStayTableAlign { left, center, right }
 
-/// Configuración de una columna para MapStayTable.
-/// Permite definir título, flex, ancho, alineación y renderizado personalizado.
+
+
 class MapStayColumnConfig<T> {
   MapStayColumnConfig({
     required this.title,
@@ -15,28 +15,28 @@ class MapStayColumnConfig<T> {
     this.render,
   });
 
-  /// Título visible en el encabezado de la columna.
+
   final String title;
 
-  /// Clave única identificadora de la columna.
+
   final String key;
 
-  /// Peso proporcional para distribución de ancho (activo si horizontalScroll es false).
+
   final int flex;
 
-  /// Ancho fijo físico para la columna (activo si horizontalScroll es true).
+
   final double? width;
 
-  /// Alineación del texto/contenido en la cabecera y celdas.
+
   final MapStayTableAlign align;
 
-  /// Constructor opcional para renderizar un widget complejo y personalizado (celda polimórfica).
-  /// Si es nulo, la tabla renderiza por defecto el método toString() del objeto.
+
+
   final Widget Function(T item)? render;
 }
 
-/// Tabla genérica, responsiva y altamente reutilizable para MapStay Anfitriones.
-/// Cumple con los principios SOLID y permite representar cualquier conjunto de datos.
+
+
 class MapStayTable<T> extends StatelessWidget {
   const MapStayTable({
     super.key,
@@ -47,33 +47,33 @@ class MapStayTable<T> extends StatelessWidget {
     this.onRowTap,
   });
 
-  /// Lista de objetos genéricos que representan las filas de datos.
+
   final List<T> data;
 
-  /// Configuración de las columnas que se desean mostrar en la tabla.
+
   final List<MapStayColumnConfig<T>> columns;
 
-  /// Si es true, alterna el fondo de las filas impares para facilitar la lectura.
+
   final bool useZebraStriping;
 
-  /// Si es true, la tabla habilitará el scroll horizontal y columnas con anchos fijos.
-  /// Si es false, distribuirá las columnas proporcionalmente en el espacio disponible.
+
+
   final bool horizontalScroll;
 
-  /// Callback opcional que se activa al hacer tap en cualquier fila de datos.
+
   final ValueChanged<T>? onRowTap;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    // Contenedor principal con bordes redondeados y recorte antiAlias
+
     final tableWidget = Container(
       decoration: BoxDecoration(
         color: theme.colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: const Color(0xFF334155), // Borde fino de slate oscuro
+          color: const Color(0xFF334155),
           width: 1.0,
         ),
       ),
@@ -85,7 +85,7 @@ class MapStayTable<T> extends StatelessWidget {
       ),
     );
 
-    // Responsividad horizontal
+
     if (horizontalScroll) {
       return SingleChildScrollView(
         scrollDirection: Axis.horizontal,
@@ -98,15 +98,15 @@ class MapStayTable<T> extends StatelessWidget {
     return tableWidget;
   }
 
-  /// Construye los elementos internos de la tabla (Cabecera, divisores y filas).
+
   List<Widget> _buildTableChildren(BuildContext context) {
     final List<Widget> children = [];
 
-    // Cabecera
+
     children.add(_buildHeader(context));
 
     if (data.isEmpty) {
-      // Estado vacío
+
       children.add(
         const Divider(height: 1, thickness: 1, color: Color(0xFF334155)),
       );
@@ -125,7 +125,7 @@ class MapStayTable<T> extends StatelessWidget {
         ),
       );
     } else {
-      // Filas de datos
+
       for (int i = 0; i < data.length; i++) {
         children.add(
           const Divider(height: 1, thickness: 1, color: Color(0xFF334155)),
@@ -137,7 +137,7 @@ class MapStayTable<T> extends StatelessWidget {
     return children;
   }
 
-  /// Renderiza la fila de encabezado.
+
   Widget _buildHeader(BuildContext context) {
     final theme = Theme.of(context);
 
@@ -155,7 +155,7 @@ class MapStayTable<T> extends StatelessWidget {
     }).toList();
 
     return Container(
-      color: theme.colorScheme.surfaceContainerHigh, // Fondo elevado #222A3D
+      color: theme.colorScheme.surfaceContainerHigh,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Row(
         children: headerCells,
@@ -163,13 +163,13 @@ class MapStayTable<T> extends StatelessWidget {
     );
   }
 
-  /// Renderiza una fila de datos individual.
+
   Widget _buildRow(BuildContext context, T item, int index) {
-    // Cebrado alterno de colores
+
     final isOdd = index % 2 != 0;
     final rowColor = useZebraStriping && isOdd
-        ? const Color(0xFF131B2E) // Alterno
-        : const Color(0xFF0B1326); // Base
+        ? const Color(0xFF131B2E)
+        : const Color(0xFF0B1326);
 
     final List<Widget> cells = columns.map((col) {
       Widget cellContent;
@@ -207,7 +207,7 @@ class MapStayTable<T> extends StatelessWidget {
     return rowWidget;
   }
 
-  /// Envoltura utilitaria para cada celda según la distribución y la alineación.
+
   Widget _buildCell(BuildContext context, Widget child, MapStayColumnConfig<T> col) {
     final alignment = switch (col.align) {
       MapStayTableAlign.left => Alignment.centerLeft,

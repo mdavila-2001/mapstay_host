@@ -5,8 +5,6 @@ import 'package:mapstay_host/presentation/widgets/inputs/inputs.dart';
 import 'package:mapstay_host/presentation/widgets/mapstay_button.dart';
 import 'package:mapstay_host/presentation/widgets/mapstay_toast.dart';
 
-/// Pantalla de inicio de sesión (Login) para MapStay Anfitriones.
-/// Cumple rigurosamente con SOLID y las especificaciones visuales de Material 3 y Dark First.
 class LoginScreen extends StatefulWidget {
   const LoginScreen({
     super.key,
@@ -14,10 +12,8 @@ class LoginScreen extends StatefulWidget {
     this.onLoginSuccess,
   });
 
-  /// Callback delegado para navegar a la pantalla de registro externa.
   final VoidCallback? onRegisterPressed;
 
-  /// Callback delegado ejecutado tras un inicio de sesión exitoso.
   final VoidCallback? onLoginSuccess;
 
   @override
@@ -41,10 +37,8 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  /// Ejecuta la validación local del formulario y dispara el proceso de Login en el AuthProvider.
   Future<void> _handleLogin(BuildContext context, AuthProvider authProvider) async {
     if (_formKey.currentState!.validate()) {
-      // Oculta el teclado virtual de inmediato
       FocusScope.of(context).unfocus();
 
       final email = _emailController.text.trim();
@@ -86,7 +80,6 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // 1. Cabecera Hero (40% de la altura física de la pantalla)
               Stack(
                 children: [
                   ClipPath(
@@ -97,7 +90,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: Stack(
                         fit: StackFit.expand,
                         children: [
-                          // Imagen Lifestyle
                           Image.network(
                             'https://lh3.googleusercontent.com/aida-public/AB6AXuDHg0TfRvoSUSnVG_4u6-LL_DifNduDL9x4RKAMVqBsgNDbbIkOhxP9eq_HSuumArXcNydu3VCQVcJpVUOToyyKP3oPDMxtg9NyocFC146Use8y36Yp3SyIgmmOJ4c6B-GZWXZO3nW-N3qCf1NlTAo7PqHvbXeRTwV40T_ik8dZOhV5K9NOCAgoAFT52VlzSkHiYhlIzi2k8bAEP30EH1FuqnfWSJenGMFz0uyZTHVlqm3y_XbVzUQhIIj7tsD818RIPb37YX_iceFb',
                             fit: BoxFit.cover,
@@ -112,7 +104,6 @@ class _LoginScreenState extends State<LoginScreen> {
                               );
                             },
                             errorBuilder: (context, error, stackTrace) {
-                              // Fallback elegante en degradados oscuros si falla la red
                               return Container(
                                 color: theme.colorScheme.surfaceContainerHigh,
                                 child: Icon(
@@ -123,7 +114,6 @@ class _LoginScreenState extends State<LoginScreen> {
                               );
                             },
                           ),
-                          // Degradado lineal para fundir la imagen con el fondo oscuro del Scaffold
                           Container(
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
@@ -145,7 +135,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 ],
               ),
 
-              // 2. Contenedor Principal con Margen Negativo
               Transform.translate(
                 offset: const Offset(0, -40),
                 child: Padding(
@@ -153,7 +142,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      // Encabezado del Formulario
                       Text(
                         '¡Te damos la bienvenida!',
                         style: theme.textTheme.headlineMedium?.copyWith(
@@ -181,13 +169,11 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       const SizedBox(height: 32),
 
-                      // Formulario de Inicio de Sesión
                       Form(
                         key: _formKey,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            // Campo Correo electrónico
                             MapStayTextField(
                               labelText: 'Correo electrónico *',
                               controller: _emailController,
@@ -200,7 +186,6 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                             const SizedBox(height: 20),
 
-                            // Campo Contraseña
                             MapStayPasswordTextField(
                               labelText: 'Contraseña *',
                               controller: _passwordController,
@@ -218,7 +203,6 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                             const SizedBox(height: 28),
 
-                            // Acción de Inicio de Sesión
                             MapStayButton(
                               text: 'Iniciar sesión',
                               isLoading: authProvider.isLoading,
@@ -226,7 +210,6 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                             const SizedBox(height: 24),
 
-                            // Enlace de Registro
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
@@ -277,14 +260,12 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 }
 
-/// Dibuja una elipse perfecta en la base de la cabecera, emulando la CSS ellipse(150% 100% at 50% 0%)
 class HeaderClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {
     final path = Path();
     path.lineTo(0, size.height * 0.82);
     
-    // Punto de control de curva Bezier cuadrática en la base central
     path.quadraticBezierTo(
       size.width / 2,
       size.height,

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'mapstay_text_field.dart';
 
-/// Campo de texto especializado para contraseñas en MapStay.
-/// Controla de manera autónoma el estado de visibilidad del texto usando un StatefulWidget interno.
+
+
 class MapStayPasswordTextField extends StatefulWidget {
   const MapStayPasswordTextField({
     super.key,
@@ -17,31 +17,31 @@ class MapStayPasswordTextField extends StatefulWidget {
     this.enabled = true,
   });
 
-  /// Etiqueta superior/flotante del campo.
+
   final String labelText;
 
-  /// Controlador para gestionar el valor del texto.
+
   final TextEditingController? controller;
 
-  /// Nodo de enfoque opcional.
+
   final FocusNode? focusNode;
 
-  /// Texto de sugerencia cuando el campo está vacío.
+
   final String? hintText;
 
-  /// Icono decorativo al inicio del campo (ej. Candado).
+
   final Widget? prefixIcon;
 
-  /// Función de validación para formularios.
+
   final String? Function(String?)? validator;
 
-  /// Callback reactivo que se ejecuta con cada cambio de texto.
+
   final ValueChanged<String>? onChanged;
 
-  /// Acción del botón de acción del teclado físico.
+
   final TextInputAction? textInputAction;
 
-  /// Determina si el campo está activo o deshabilitado.
+
   final bool enabled;
 
   @override

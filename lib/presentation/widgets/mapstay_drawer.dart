@@ -66,7 +66,7 @@ class MapStayDrawer extends StatelessWidget {
                     context: context,
                     title: 'Mis Alojamientos',
                     icon: Icons.home_work_outlined,
-                    routeName: '/alojamientos',
+                    routeName: '/properties',
                   ),
                   const SizedBox(height: 8),
                   _buildDrawerItem(

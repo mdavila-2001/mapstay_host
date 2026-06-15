@@ -6,6 +6,15 @@ class PropertyModel extends Property {
     required super.nombre,
     required super.descripcion,
     required super.precioNoche,
+    required super.costoLimpieza,
+    required super.cantPersonas,
+    required super.cantCamas,
+    required super.cantBanios,
+    required super.cantHabitaciones,
+    required super.cantVehiculosParqueo,
+    required super.tieneWifi,
+    required super.latitud,
+    required super.longitud,
     required super.ciudad,
     required super.hostId,
     required super.activo,
@@ -13,7 +22,6 @@ class PropertyModel extends Property {
   });
 
   factory PropertyModel.fromJson(Map<String, dynamic> json) {
-    // Parsea el precio por noche de forma segura
     double parsedPrice = 0.0;
     if (json['precioNoche'] != null) {
       parsedPrice = double.tryParse(json['precioNoche'].toString()) ?? 0.0;
@@ -21,7 +29,13 @@ class PropertyModel extends Property {
       parsedPrice = double.tryParse(json['precio_noche'].toString()) ?? 0.0;
     }
 
-    // Parsea si está activo de forma segura (soporta bool o int)
+    double parsedCleaningFee = 0.0;
+    if (json['costoLimpieza'] != null) {
+      parsedCleaningFee = double.tryParse(json['costoLimpieza'].toString()) ?? 0.0;
+    } else if (json['costo_limpieza'] != null) {
+      parsedCleaningFee = double.tryParse(json['costo_limpieza'].toString()) ?? 0.0;
+    }
+
     bool isActive = true;
     if (json['activo'] != null) {
       if (json['activo'] is bool) {
@@ -31,7 +45,21 @@ class PropertyModel extends Property {
       }
     }
 
-    // Parsea el ID de arrendatario (remoto usa arrendatario_id / arrendatarioId)
+    bool parsedWifi = false;
+    if (json['tieneWifi'] != null) {
+      if (json['tieneWifi'] is bool) {
+        parsedWifi = json['tieneWifi'];
+      } else if (json['tieneWifi'] is int) {
+        parsedWifi = json['tieneWifi'] == 1;
+      }
+    } else if (json['tiene_wifi'] != null) {
+      if (json['tiene_wifi'] is bool) {
+        parsedWifi = json['tiene_wifi'];
+      } else if (json['tiene_wifi'] is int) {
+        parsedWifi = json['tiene_wifi'] == 1;
+      }
+    }
+
     int parsedHostId = 0;
     if (json['arrendatario_id'] != null) {
       parsedHostId = int.tryParse(json['arrendatario_id'].toString()) ?? 0;
@@ -39,7 +67,6 @@ class PropertyModel extends Property {
       parsedHostId = int.tryParse(json['arrendatarioId'].toString()) ?? 0;
     }
 
-    // Parsea la imagen de forma inteligente (soporta listado de fotos o campo único)
     String parsedPhoto = '';
     if (json['fotos'] != null && json['fotos'] is List && (json['fotos'] as List).isNotEmpty) {
       final first = (json['fotos'] as List).first;
@@ -52,7 +79,6 @@ class PropertyModel extends Property {
       parsedPhoto = json['foto'].toString();
     }
 
-    // Normaliza rutas relativas del backend convirtiéndolas en URLs absolutas válidas
     if (parsedPhoto.isNotEmpty && !parsedPhoto.startsWith('http://') && !parsedPhoto.startsWith('https://')) {
       const defaultApiBaseUrl = 'http://67.205.172.167/api';
       String domain = 'http://67.205.172.167';
@@ -76,7 +102,6 @@ class PropertyModel extends Property {
       }
     }
 
-    // Fallback de imagen en caso de no contar con foto
     if (parsedPhoto.isEmpty) {
       parsedPhoto = 'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=600&q=80';
     }
@@ -86,6 +111,15 @@ class PropertyModel extends Property {
       nombre: json['nombre'] as String? ?? 'Alojamiento sin nombre',
       descripcion: json['descripcion'] as String? ?? '',
       precioNoche: parsedPrice,
+      costoLimpieza: parsedCleaningFee,
+      cantPersonas: int.tryParse(json['cantPersonas']?.toString() ?? json['cant_personas']?.toString() ?? '') ?? 1,
+      cantCamas: int.tryParse(json['cantCamas']?.toString() ?? json['cant_camas']?.toString() ?? '') ?? 1,
+      cantBanios: int.tryParse(json['cantBanios']?.toString() ?? json['cant_banios']?.toString() ?? '') ?? 1,
+      cantHabitaciones: int.tryParse(json['cantHabitaciones']?.toString() ?? json['cant_habitaciones']?.toString() ?? '') ?? 1,
+      cantVehiculosParqueo: int.tryParse(json['cantVehiculosParqueo']?.toString() ?? json['cant_vehiculos_parqueo']?.toString() ?? '') ?? 0,
+      tieneWifi: parsedWifi,
+      latitud: json['latitud']?.toString() ?? json['lat_itud']?.toString() ?? '0.0',
+      longitud: json['longitud']?.toString() ?? json['long_itud']?.toString() ?? '0.0',
       ciudad: json['ciudad'] as String? ?? 'Santa Cruz',
       hostId: parsedHostId,
       activo: isActive,

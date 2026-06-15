@@ -76,7 +76,6 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<Host?> getCurrentSession() async {
     final prefs = await SharedPreferences.getInstance();
-    // Fallback temporarily to 'arrendatario_id' if 'host_id' is not set yet, so existing sessions don't get lost
     int? id = prefs.getInt('host_id') ?? prefs.getInt('arrendatario_id');
     final name = prefs.getString('nombrecompleto');
     final email = prefs.getString('email');

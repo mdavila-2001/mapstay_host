@@ -11,7 +11,6 @@ class DI {
   late final PropertyRepository propertyRepository;
 
   Future<void> init() async {
-    // Repositories
     authRepository = AuthRepositoryImpl();
     propertyRepository = PropertyRepositoryImpl();
   }

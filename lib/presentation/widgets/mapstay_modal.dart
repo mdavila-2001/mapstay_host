@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
-/// Componente utilitario y contenedor modular para MapStay Anfitriones.
-/// Proporciona diálogos y paneles inferiores sincronizados estéticamente
-/// con el Design System (Material 3) y preparados para áreas seguras y teclados físicos.
+
+
+
 class MapStayModal {
-  /// Muestra una hoja inferior (Bottom Sheet) modular.
-  /// 
-  /// Sincronizado estéticamente con el tono elevado de la aplicación (#222A3D)
-  /// y configurado para desplazarse de forma nativa al interactuar con el teclado físico.
+
+
+
+
   static Future<T?> showBottomSheet<T>(
     BuildContext context, {
     required String title,
@@ -19,9 +19,9 @@ class MapStayModal {
     return showModalBottomSheet<T>(
       context: context,
       isDismissible: isDismissible,
-      isScrollControlled: true, // Crucial para permitir reajuste de teclado y scrolls internos
-      backgroundColor: theme.colorScheme.surfaceContainerHigh, // Fondo elevado #222A3D
-      barrierColor: Colors.black.withValues(alpha: 0.7), // Oscurecimiento posterior slate opaco
+      isScrollControlled: true,
+      backgroundColor: theme.colorScheme.surfaceContainerHigh,
+      barrierColor: Colors.black.withValues(alpha: 0.7),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(
           top: Radius.circular(12),
@@ -30,7 +30,7 @@ class MapStayModal {
       builder: (context) {
         return SafeArea(
           child: Padding(
-            // Evita que el teclado virtual cubra las entradas de texto del modal
+
             padding: EdgeInsets.only(
               bottom: MediaQuery.of(context).viewInsets.bottom,
             ),
@@ -38,7 +38,7 @@ class MapStayModal {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Tirador decorativo de arrastre superior
+
                   Container(
                     width: 36,
                     height: 4,
@@ -48,7 +48,7 @@ class MapStayModal {
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),
-                  // Cabecera: Título y botón opcional de cerrar
+
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
                     child: Row(
@@ -74,13 +74,13 @@ class MapStayModal {
                       ],
                     ),
                   ),
-                  // Divisor estructural fino
+
                   const Divider(
                     height: 1,
                     thickness: 1,
                     color: Color(0xFF334155),
                   ),
-                  // Contenido principal del BottomSheet
+
                   Padding(
                     padding: const EdgeInsets.all(20.0),
                     child: content,
@@ -94,9 +94,9 @@ class MapStayModal {
     );
   }
 
-  /// Muestra una alerta o ventana emergente (Dialog) centrada en la pantalla.
-  /// 
-  /// Sincronizado con el fondo base (#171F33) y esquinas redondeadas perimetrales de 12px.
+
+
+
   static Future<T?> showCustomDialog<T>(
     BuildContext context, {
     required String title,
@@ -112,7 +112,7 @@ class MapStayModal {
       barrierColor: Colors.black.withValues(alpha: 0.7),
       builder: (context) {
         return Dialog(
-          backgroundColor: theme.colorScheme.surfaceContainer, // Fondo #171F33
+          backgroundColor: theme.colorScheme.surfaceContainer,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
@@ -123,7 +123,7 @@ class MapStayModal {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // Cabecera del diálogo: Título y botón opcional de cerrar
+
                   Padding(
                     padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
                     child: Row(
@@ -149,13 +149,13 @@ class MapStayModal {
                       ],
                     ),
                   ),
-                  // Divisor estructural fino
+
                   const Divider(
                     height: 1,
                     thickness: 1,
                     color: Color(0xFF334155),
                   ),
-                  // Contenido principal del diálogo
+
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                     child: Material(
@@ -168,7 +168,7 @@ class MapStayModal {
                       ),
                     ),
                   ),
-                  // Acciones inferiores (si se suministran)
+
                   if (actions != null && actions.isNotEmpty) ...[
                     const Divider(
                       height: 1,

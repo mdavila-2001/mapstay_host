@@ -26,7 +26,7 @@ class MockBooking {
   });
 
   @override
-  String toString() => guestName; // Fallback simple para visualización por defecto
+  String toString() => guestName;
 }
 
 class TestComponentScreen extends StatefulWidget {
@@ -39,9 +39,9 @@ class TestComponentScreen extends StatefulWidget {
 class _TestComponentScreenState extends State<TestComponentScreen> {
   bool _isLoading = false;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  String _activeRoute = '/alojamientos';
+  String _activeRoute = '/components';
 
-  // Lista de reservas de prueba para la tabla genérica
+
   final List<MockBooking> _mockBookings = const [
     MockBooking(
       id: 'B-1024',
@@ -77,7 +77,7 @@ class _TestComponentScreenState extends State<TestComponentScreen> {
     ),
   ];
 
-  // Claves y controladores para el formulario de prueba de inputs
+
   final _formKey = GlobalKey<FormState>();
   final _textController = TextEditingController();
   final _emailController = TextEditingController();
@@ -86,8 +86,8 @@ class _TestComponentScreenState extends State<TestComponentScreen> {
   final _decimalController = TextEditingController();
   final _dateController = TextEditingController();
   
-  // Estado local para los selectores e imágenes
-  int? _wifiValue; // Debe retornar 1 o 0 (entero)
+
+  int? _wifiValue;
   List<File> _selectedImages = [];
 
   @override
@@ -104,9 +104,9 @@ class _TestComponentScreenState extends State<TestComponentScreen> {
   @override
   Widget build(BuildContext context) {
     final String appBarTitle = switch (_activeRoute) {
-      '/alojamientos' => 'Mis Alojamientos',
-      '/reservas' => 'Reservas Recibidas',
-      '/modo_huesped' => 'Modo Huésped',
+      '/properties' => 'Mis Alojamientos',
+      '/bookings' => 'Reservas Recibidas',
+      '/components' => 'Página de Componentes',
       _ => 'MapStay',
     };
 
@@ -129,7 +129,7 @@ class _TestComponentScreenState extends State<TestComponentScreen> {
         currentRoute: _activeRoute,
         onNavigate: (route) {
           _scaffoldKey.currentState?.closeDrawer();
-          if (route == '/alojamientos') {
+          if (route == '/componentes') {
             Navigator.of(context).pop();
           } else {
             setState(() {
@@ -326,7 +326,7 @@ class _TestComponentScreenState extends State<TestComponentScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // 6.1 MapStayTextField (Base - Text)
+
                   MapStayTextField(
                     labelText: 'Nombre del Alojamiento',
                     controller: _textController,
@@ -341,7 +341,7 @@ class _TestComponentScreenState extends State<TestComponentScreen> {
                   ),
                   const SizedBox(height: 20),
 
-                  // 6.2 MapStayTextField (Base - Email)
+
                   MapStayTextField(
                     labelText: 'Correo Electrónico de Contacto',
                     controller: _emailController,
@@ -351,7 +351,7 @@ class _TestComponentScreenState extends State<TestComponentScreen> {
                   ),
                   const SizedBox(height: 20),
 
-                  // 6.3 MapStayPasswordTextField (Password)
+
                   MapStayPasswordTextField(
                     labelText: 'Contraseña de Confirmación',
                     controller: _passwordController,
@@ -366,7 +366,7 @@ class _TestComponentScreenState extends State<TestComponentScreen> {
                   ),
                   const SizedBox(height: 20),
 
-                  // 6.4 MapStayNumberTextField (Integer Counters)
+
                   Row(
                     children: [
                       Expanded(
@@ -385,7 +385,7 @@ class _TestComponentScreenState extends State<TestComponentScreen> {
                         ),
                       ),
                       const SizedBox(width: 12),
-                      // 6.5 MapStayNumberTextField (Decimal Financials)
+
                       Expanded(
                         child: MapStayNumberTextField(
                           labelText: 'Precio por Noche',
@@ -405,7 +405,7 @@ class _TestComponentScreenState extends State<TestComponentScreen> {
                   ),
                   const SizedBox(height: 20),
 
-                  // 6.6 MapStayDateTextField (Native DatePicker Sync)
+
                   MapStayDateTextField(
                     labelText: 'Fecha de Disponibilidad Inicial',
                     controller: _dateController,
@@ -423,7 +423,7 @@ class _TestComponentScreenState extends State<TestComponentScreen> {
                   ),
                   const SizedBox(height: 20),
 
-                  // 6.7 MapStaySelectField (Dropdown & Binary 1/0 Mapping)
+
                   MapStaySelectField<int>(
                     labelText: '¿Tiene servicio de Wi-Fi?',
                     value: _wifiValue,
@@ -447,7 +447,7 @@ class _TestComponentScreenState extends State<TestComponentScreen> {
                   ),
                   const SizedBox(height: 24),
 
-                  // 6.8 MapStayImageField (Multimedia Grid)
+
                   MapStayImageField(
                     labelText: 'Fotos del Alojamiento (Mín. 1, Máx. 6)',
                     maxImages: 6,
@@ -460,7 +460,7 @@ class _TestComponentScreenState extends State<TestComponentScreen> {
                   ),
                   const SizedBox(height: 32),
 
-                  // Botón de Enviar Formulario para verificar validaciones
+
                   MapStayButton(
                     text: 'Validar y Guardar Formulario',
                     icon: const Icon(Icons.save_outlined),
@@ -471,7 +471,7 @@ class _TestComponentScreenState extends State<TestComponentScreen> {
                           return;
                         }
                         
-                        // Si todo es válido, mostramos los payloads resultantes listos para el backend
+
                         final String message = 
                           '¡Datos Validados!\n'
                           'Email: ${_emailController.text}\n'
