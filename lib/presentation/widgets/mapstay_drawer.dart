@@ -75,13 +75,7 @@ class MapStayDrawer extends StatelessWidget {
                     icon: Icons.date_range_outlined,
                     routeName: '/reservas',
                   ),
-                  const SizedBox(height: 8),
-                  _buildDrawerItem(
-                    context: context,
-                    title: 'Página de componentes',
-                    icon: Icons.swap_horiz_rounded,
-                    routeName: '/componentes',
-                  ),
+
                 ],
               ),
             ),

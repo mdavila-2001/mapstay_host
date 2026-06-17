@@ -73,9 +73,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         currentRoute: '/properties',
         onNavigate: (route) {
           Navigator.of(context).pop();
-          if (route == '/componentes') {
-            Navigator.of(context).pushNamed('/componentes');
-          } else if (route == '/reservas') {
+          if (route == '/reservas') {
             Navigator.of(context).pushNamed('/reservas');
           }
         },

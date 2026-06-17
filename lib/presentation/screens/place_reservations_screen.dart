@@ -149,8 +149,6 @@ class _PlaceReservationsScreenState extends State<PlaceReservationsScreen> {
           Navigator.of(context).pop();
           if (route == '/properties') {
             Navigator.of(context).pushReplacementNamed('/dashboard');
-          } else if (route == '/componentes') {
-            Navigator.of(context).pushNamed('/componentes');
           }
         },
         onLogout: () async {
@@ -438,17 +436,6 @@ class _BookingCard extends StatelessWidget {
         reservation.fechaSalida.hour == 0 && reservation.fechaSalida.minute == 0
         ? '11:00 AM'
         : _formatTime(reservation.fechaSalida);
-
-    final computedNights = DateTime(
-      reservation.fechaSalida.year,
-      reservation.fechaSalida.month,
-      reservation.fechaSalida.day,
-    ).difference(DateTime(
-      reservation.fechaLlegada.year,
-      reservation.fechaLlegada.month,
-      reservation.fechaLlegada.day,
-    )).inDays;
-    final nights = computedNights > 0 ? computedNights : 1;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
