@@ -2,11 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:mapstay_host/core/di/injection_container.dart';
 import 'package:mapstay_host/core/theme/theme.dart';
+import 'package:mapstay_host/domain/entities/property.dart';
 import 'package:mapstay_host/presentation/providers/auth_provider.dart';
 import 'package:mapstay_host/presentation/providers/property_provider.dart';
+import 'package:mapstay_host/presentation/providers/reservation_provider.dart';
 import 'package:mapstay_host/presentation/screens/login_screen.dart';
 import 'package:mapstay_host/presentation/screens/register_screen.dart';
 import 'package:mapstay_host/presentation/screens/dashboard_screen.dart';
+import 'package:mapstay_host/presentation/screens/property_form_screen.dart';
+import 'package:mapstay_host/presentation/screens/test_component_screen.dart';
+import 'package:mapstay_host/presentation/screens/property_detail_screen.dart';
+import 'package:mapstay_host/presentation/screens/place_reservations_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,6 +26,9 @@ void main() async {
         ),
         ChangeNotifierProvider(
           create: (_) => PropertyProvider(propertyRepository: DI.instance.propertyRepository),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => ReservationProvider(reservationRepository: DI.instance.reservationRepository),
         ),
       ],
       child: const MyApp(),
@@ -36,7 +45,42 @@ class MyApp extends StatelessWidget {
       title: 'MapStay Arrendatario',
       theme: MapStayTheme.darkTheme,
       debugShowCheckedModeBanner: false,
-      home: const AuthWrapper(),
+      initialRoute: '/',
+      routes: {
+        '/': (context) => const AuthWrapper(),
+        '/login': (context) => LoginScreen(
+              onRegisterPressed: () => Navigator.of(context).pushReplacementNamed('/register'),
+              onLoginSuccess: () => Navigator.of(context).pushReplacementNamed('/dashboard'),
+            ),
+        '/register': (context) => RegisterScreen(
+              onLoginPressed: () => Navigator.of(context).pushReplacementNamed('/login'),
+              onRegisterSuccess: () => Navigator.of(context).pushReplacementNamed('/dashboard'),
+            ),
+        '/dashboard': (context) => const DashboardScreen(),
+        '/componentes': (context) => const TestComponentScreen(),
+      },
+      onGenerateRoute: (settings) {
+        if (settings.name == '/property-form') {
+          final property = settings.arguments as Property?;
+          return MaterialPageRoute(
+            builder: (context) => PropertyFormScreen(property: property),
+            settings: settings,
+          );
+        } else if (settings.name == '/property-detail') {
+          final property = settings.arguments as Property;
+          return MaterialPageRoute(
+            builder: (context) => PropertyDetailScreen(property: property),
+            settings: settings,
+          );
+        } else if (settings.name == '/reservas') {
+          final propertyId = settings.arguments as int?;
+          return MaterialPageRoute(
+            builder: (context) => PlaceReservationsScreen(propertyId: propertyId),
+            settings: settings,
+          );
+        }
+        return null;
+      },
     );
   }
 }
@@ -53,6 +97,20 @@ class _AuthWrapperState extends State<AuthWrapper> {
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = Provider.of<AuthProvider>(context);
+
+    if (!authProvider.isSessionLoaded) {
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
+    if (authProvider.isAuthenticated) {
+      return const DashboardScreen();
+    }
+
     if (_showLogin) {
       return LoginScreen(
         onRegisterPressed: () {
@@ -61,9 +119,7 @@ class _AuthWrapperState extends State<AuthWrapper> {
           });
         },
         onLoginSuccess: () {
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (_) => const DashboardScreen()),
-          );
+          Navigator.of(context).pushReplacementNamed('/dashboard');
         },
       );
     } else {
@@ -74,9 +130,7 @@ class _AuthWrapperState extends State<AuthWrapper> {
           });
         },
         onRegisterSuccess: () {
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (_) => const DashboardScreen()),
-          );
+          Navigator.of(context).pushReplacementNamed('/dashboard');
         },
       );
     }

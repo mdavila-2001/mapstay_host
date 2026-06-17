@@ -40,4 +40,8 @@ class ApiClient {
       },
     );
   }
+
+  Future<http.Response> getRequest(String path) => ApiClient.get(path);
+  Future<http.Response> postRequest(String path, Map<String, dynamic> body) => ApiClient.post(path, body);
+  Future<http.Response> putRequest(String path, Map<String, dynamic> body) => ApiClient.put(path, body);
 }

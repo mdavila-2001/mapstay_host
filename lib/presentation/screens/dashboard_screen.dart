@@ -6,10 +6,7 @@ import 'package:mapstay_host/presentation/widgets/mapstay_app_bar.dart';
 import 'package:mapstay_host/presentation/widgets/mapstay_drawer.dart';
 import 'package:mapstay_host/presentation/widgets/mapstay_button.dart';
 import 'package:mapstay_host/presentation/widgets/mapstay_toast.dart';
-import 'package:mapstay_host/presentation/screens/test_component_screen.dart';
-import 'package:mapstay_host/presentation/screens/property_form_screen.dart';
 import 'package:mapstay_host/presentation/widgets/properties/property_card.dart';
-import 'package:mapstay_host/main.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -49,9 +46,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   void _handleAddNewPlace() {
-    Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => const PropertyFormScreen()),
-    ).then((_) => _loadProperties());
+    Navigator.of(context).pushNamed('/property-form').then((_) => _loadProperties());
   }
 
   @override
@@ -71,9 +66,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         onLogoutPressed: () async {
           final navigator = Navigator.of(context);
           await authProvider.logout();
-          navigator.pushReplacement(
-            MaterialPageRoute(builder: (_) => const AuthWrapper()),
-          );
+          navigator.pushReplacementNamed('/');
         },
       ),
       drawer: MapStayDrawer(
@@ -81,17 +74,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
         onNavigate: (route) {
           Navigator.of(context).pop();
           if (route == '/componentes') {
-            Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const TestComponentScreen()),
-            );
+            Navigator.of(context).pushNamed('/componentes');
+          } else if (route == '/reservas') {
+            Navigator.of(context).pushNamed('/reservas');
           }
         },
         onLogout: () async {
           final navigator = Navigator.of(context);
           await authProvider.logout();
-          navigator.pushReplacement(
-            MaterialPageRoute(builder: (_) => const AuthWrapper()),
-          );
+          navigator.pushReplacementNamed('/');
         },
       ),
       body: RefreshIndicator(
@@ -143,18 +134,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       return PropertyCard(
                         property: property,
                         onEditPressed: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (_) => PropertyFormScreen(property: property),
-                            ),
+                          Navigator.of(context).pushNamed(
+                            '/property-form',
+                            arguments: property,
                           ).then((_) => _loadProperties());
-                        },
-                        onMorePressed: () {
-                          MapStayToast.show(
-                            context,
-                            message: 'Opciones de: ${property.nombre}',
-                            type: MapStayToastType.info,
-                          );
                         },
                       );
                     },

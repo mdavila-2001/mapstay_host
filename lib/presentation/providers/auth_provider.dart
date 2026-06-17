@@ -12,12 +12,14 @@ class AuthProvider extends ChangeNotifier {
   String? _errorMessage;
   int? _userId;
   String? _userName;
+  bool _isSessionLoaded = false;
 
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
   int? get userId => _userId;
   String? get userName => _userName;
   bool get isAuthenticated => _userId != null;
+  bool get isSessionLoaded => _isSessionLoaded;
 
   Future<void> _loadSession() async {
     try {
@@ -25,9 +27,11 @@ class AuthProvider extends ChangeNotifier {
       if (user != null) {
         _userId = user.id;
         _userName = user.nombreCompleto;
-        notifyListeners();
       }
-    } catch (_) {}
+    } catch (_) {} finally {
+      _isSessionLoaded = true;
+      notifyListeners();
+    }
   }
 
   Future<bool> login(String email, String password) async {

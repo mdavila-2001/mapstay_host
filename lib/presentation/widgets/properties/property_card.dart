@@ -6,28 +6,33 @@ class PropertyCard extends StatelessWidget {
     super.key,
     required this.property,
     required this.onEditPressed,
-    required this.onMorePressed,
   });
 
   final Property property;
   final VoidCallback onEditPressed;
-  final VoidCallback onMorePressed;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Container(
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainer,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: theme.colorScheme.outline.withValues(alpha: 0.1),
+    return GestureDetector(
+      onTap: () {
+        Navigator.of(context).pushNamed(
+          '/property-detail',
+          arguments: property,
+        );
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: theme.colorScheme.surfaceContainer,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: theme.colorScheme.outline.withValues(alpha: 0.1),
+          ),
         ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
           AspectRatio(
             aspectRatio: 16 / 9,
             child: ClipRRect(
@@ -38,29 +43,30 @@ class PropertyCard extends StatelessWidget {
               child: Stack(
                 fit: StackFit.expand,
                 children: [
-                  Image.network(
-                    property.firstPhoto,
-                    fit: BoxFit.cover,
-                    loadingBuilder: (context, child, loadingProgress) {
-                      if (loadingProgress == null) return child;
-                      return Container(
-                        color: theme.colorScheme.surfaceContainerHigh,
-                        child: const Center(
-                          child: CircularProgressIndicator(),
+                  property.firstPhoto.startsWith('assets/')
+                      ? Image.asset(
+                          property.firstPhoto,
+                          fit: BoxFit.cover,
+                        )
+                      : Image.network(
+                          property.firstPhoto,
+                          fit: BoxFit.cover,
+                          loadingBuilder: (context, child, loadingProgress) {
+                            if (loadingProgress == null) return child;
+                            return Container(
+                              color: theme.colorScheme.surfaceContainerHigh,
+                              child: const Center(
+                                child: CircularProgressIndicator(),
+                              ),
+                            );
+                          },
+                          errorBuilder: (context, error, stackTrace) {
+                            return Image.asset(
+                              'assets/no_pic.png',
+                              fit: BoxFit.cover,
+                            );
+                          },
                         ),
-                      );
-                    },
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
-                        color: theme.colorScheme.surfaceContainerHigh,
-                        child: Icon(
-                          Icons.broken_image_outlined,
-                          color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.3),
-                          size: 48,
-                        ),
-                      );
-                    },
-                  ),
                   Positioned(
                     top: 12,
                     right: 12,
@@ -83,7 +89,7 @@ class PropertyCard extends StatelessWidget {
                           ),
                           const SizedBox(width: 6),
                           Text(
-                            property.activo ? 'Active' : 'Inactive',
+                            property.activo ? 'Activo' : 'Inactivo',
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
@@ -148,7 +154,7 @@ class PropertyCard extends StatelessWidget {
                             ),
                           ),
                           TextSpan(
-                            text: ' / night (${property.ciudad})',
+                            text: ' / noche (${property.ciudad})',
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.normal,
@@ -158,24 +164,12 @@ class PropertyCard extends StatelessWidget {
                         ],
                       ),
                     ),
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        IconButton(
-                          onPressed: onEditPressed,
-                          icon: const Icon(Icons.edit_outlined),
-                          color: theme.colorScheme.onSurfaceVariant,
-                          tooltip: 'Editar alojamiento',
-                          visualDensity: VisualDensity.compact,
-                        ),
-                        IconButton(
-                          onPressed: onMorePressed,
-                          icon: const Icon(Icons.more_vert_rounded),
-                          color: theme.colorScheme.onSurfaceVariant,
-                          tooltip: 'Más opciones',
-                          visualDensity: VisualDensity.compact,
-                        ),
-                      ],
+                    IconButton(
+                      onPressed: onEditPressed,
+                      icon: const Icon(Icons.edit_outlined),
+                      color: theme.colorScheme.onSurfaceVariant,
+                      tooltip: 'Editar alojamiento',
+                      visualDensity: VisualDensity.compact,
                     ),
                   ],
                 ),
@@ -184,8 +178,9 @@ class PropertyCard extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
+    ),
+  );
+}
 }
 
 

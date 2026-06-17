@@ -19,6 +19,7 @@ class PropertyModel extends Property {
     required super.hostId,
     required super.activo,
     required super.firstPhoto,
+    required super.fotos,
   });
 
   factory PropertyModel.fromJson(Map<String, dynamic> json) {
@@ -67,43 +68,56 @@ class PropertyModel extends Property {
       parsedHostId = int.tryParse(json['arrendatarioId'].toString()) ?? 0;
     }
 
-    String parsedPhoto = '';
-    if (json['fotos'] != null && json['fotos'] is List && (json['fotos'] as List).isNotEmpty) {
-      final first = (json['fotos'] as List).first;
-      if (first is Map && first['foto'] != null) {
-        parsedPhoto = first['foto'].toString();
-      } else if (first is String) {
-        parsedPhoto = first;
+    const defaultApiBaseUrl = 'http://67.205.172.167/api';
+    String domain = 'http://67.205.172.167';
+    try {
+      const envUrl = String.fromEnvironment('PUBLIC_API_URL');
+      if (envUrl.isNotEmpty) {
+        domain = Uri.parse(envUrl).origin;
+      } else {
+        domain = Uri.parse(defaultApiBaseUrl).origin;
+      }
+    } catch (_) {}
+
+    String normalizePhoto(String path) {
+      if (path.isEmpty) return '';
+      if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('assets/')) {
+        return path;
+      }
+      if (path.startsWith('/')) {
+        return '$domain$path';
+      } else if (path.startsWith('storage/')) {
+        return '$domain/$path';
+      } else if (path.startsWith('public/')) {
+        return '$domain/${path.replaceFirst('public/', '')}';
+      } else {
+        return '$domain/storage/$path';
+      }
+    }
+
+    List<String> parsedPhotos = [];
+    if (json['fotos'] != null && json['fotos'] is List) {
+      for (var item in json['fotos']) {
+        String p = '';
+        if (item is Map && item['foto'] != null) {
+          p = item['foto'].toString();
+        } else if (item is String) {
+          p = item;
+        }
+        if (p.isNotEmpty) {
+          parsedPhotos.add(normalizePhoto(p));
+        }
       }
     } else if (json['foto'] != null) {
-      parsedPhoto = json['foto'].toString();
+      parsedPhotos.add(normalizePhoto(json['foto'].toString()));
     }
 
-    if (parsedPhoto.isNotEmpty && !parsedPhoto.startsWith('http://') && !parsedPhoto.startsWith('https://')) {
-      const defaultApiBaseUrl = 'http://67.205.172.167/api';
-      String domain = 'http://67.205.172.167';
-      try {
-        const envUrl = String.fromEnvironment('PUBLIC_API_URL');
-        if (envUrl.isNotEmpty) {
-          domain = Uri.parse(envUrl).origin;
-        } else {
-          domain = Uri.parse(defaultApiBaseUrl).origin;
-        }
-      } catch (_) {}
-
-      if (parsedPhoto.startsWith('/')) {
-        parsedPhoto = '$domain$parsedPhoto';
-      } else if (parsedPhoto.startsWith('storage/')) {
-        parsedPhoto = '$domain/$parsedPhoto';
-      } else if (parsedPhoto.startsWith('public/')) {
-        parsedPhoto = '$domain/${parsedPhoto.replaceFirst('public/', '')}';
-      } else {
-        parsedPhoto = '$domain/storage/$parsedPhoto';
-      }
-    }
-
-    if (parsedPhoto.isEmpty) {
-      parsedPhoto = 'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=600&q=80';
+    String parsedPhoto = '';
+    if (parsedPhotos.isNotEmpty) {
+      parsedPhoto = parsedPhotos.first;
+    } else {
+      parsedPhoto = 'assets/no_pic.png';
+      parsedPhotos.add(parsedPhoto);
     }
 
     return PropertyModel(
@@ -124,6 +138,7 @@ class PropertyModel extends Property {
       hostId: parsedHostId,
       activo: isActive,
       firstPhoto: parsedPhoto,
+      fotos: parsedPhotos,
     );
   }
 }
