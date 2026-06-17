@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+import '../../core/utils/photo_url_helper.dart';
 import '../../domain/entities/property.dart';
-import '../widgets/mapstay_button.dart';
-import '../widgets/mapstay_modal.dart';
-import '../widgets/mapstay_toast.dart';
 
 class PropertyDetailScreen extends StatefulWidget {
   const PropertyDetailScreen({
@@ -21,137 +19,6 @@ class PropertyDetailScreen extends StatefulWidget {
 class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
   int _selectedImageIndex = 0;
   bool _isDescriptionExpanded = false;
-  bool _isFavorite = false;
-
-  void _showReservationModal(BuildContext context) {
-    final double cleaningFee = widget.property.costoLimpieza;
-    const double serviceFee = 60.0;
-    final double nightsCost = widget.property.precioNoche * 3;
-    final double totalCost = nightsCost + cleaningFee + serviceFee;
-
-    MapStayModal.showBottomSheet(
-      context,
-      title: 'Confirmar Reserva',
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surface,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Fechas',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).colorScheme.onSurface,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      '12 Oct - 15 Oct (3 noches)',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
-                ),
-                TextButton(
-                  onPressed: () {},
-                  child: Text(
-                    'EDITAR',
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.secondary,
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 24),
-          Text(
-            'Desglose de Precios',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              fontFamily: 'Montserrat',
-              color: Theme.of(context).colorScheme.onSurface,
-            ),
-          ),
-          const SizedBox(height: 16),
-          _PriceBreakdownRow(
-            label: '\$${widget.property.precioNoche.toStringAsFixed(0)} x 3 noches',
-            value: '\$${nightsCost.toStringAsFixed(0)}',
-          ),
-          const SizedBox(height: 12),
-          _PriceBreakdownRow(
-            label: 'Costo de limpieza',
-            value: '\$${cleaningFee.toStringAsFixed(0)}',
-          ),
-          const SizedBox(height: 12),
-          _PriceBreakdownRow(
-            label: 'Tarifa de servicio StayHub',
-            value: '\$${serviceFee.toStringAsFixed(0)}',
-          ),
-          const SizedBox(height: 16),
-          const Divider(
-            height: 1,
-            thickness: 1,
-            color: Color(0xFF334155),
-          ),
-          const SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Total (USD)',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'Montserrat',
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
-              ),
-              Text(
-                '\$${totalCost.toStringAsFixed(0)}',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'Montserrat',
-                  color: Theme.of(context).colorScheme.secondary,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
-          MapStayButton(
-            text: 'Confirmar y Pagar',
-            icon: const Icon(Icons.lock_outline_rounded),
-            onPressed: () {
-              Navigator.pop(context);
-              MapStayToast.show(
-                context,
-                message: '¡Reserva procesada exitosamente!',
-                type: MapStayToastType.success,
-              );
-            },
-          ),
-        ],
-      ),
-    );
-  }
 
   Widget _buildGalleryImage(String url) {
     if (url.startsWith('assets/')) {
@@ -161,7 +28,7 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
       );
     }
     return Image.network(
-      url,
+      PhotoUrlHelper.ensureProtocol(url),
       fit: BoxFit.cover,
       loadingBuilder: (context, child, loadingProgress) {
         if (loadingProgress == null) return child;
@@ -251,36 +118,10 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
                 ),
               ),
               SliverPadding(
-                padding: const EdgeInsets.fromLTRB(16, 20, 16, 100),
+                padding: const EdgeInsets.fromLTRB(16, 20, 16, 40),
                 sliver: SliverList(
                   delegate: SliverChildListDelegate([
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.star_rounded,
-                          color: theme.colorScheme.secondary,
-                          size: 18,
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          '4.96',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: theme.colorScheme.onSurface,
-                          ),
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          '(128 reseñas)',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: theme.colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
+
                     Text(
                       property.nombre,
                       style: const TextStyle(
@@ -297,6 +138,29 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
                         color: theme.colorScheme.onSurfaceVariant,
                       ),
                     ),
+                    const SizedBox(height: 8),
+                    RichText(
+                      text: TextSpan(
+                        children: [
+                          TextSpan(
+                            text: '\$${property.precioNoche.toStringAsFixed(0)}',
+                            style: TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                              color: theme.colorScheme.secondary,
+                              fontFamily: 'Montserrat',
+                            ),
+                          ),
+                          TextSpan(
+                            text: ' / noche',
+                            style: TextStyle(
+                              fontSize: 15,
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                     const SizedBox(height: 16),
                     Container(
                       padding: const EdgeInsets.symmetric(vertical: 12),
@@ -306,8 +170,9 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
                           bottom: BorderSide(color: Color(0xFF334155), width: 1),
                         ),
                       ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      child: Wrap(
+                        spacing: 16,
+                        runSpacing: 12,
                         children: [
                           _StatItem(
                             icon: Icons.group_outlined,
@@ -315,22 +180,25 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
                           ),
                           _StatItem(
                             icon: Icons.bed_outlined,
-                            label: '${property.cantCamas} Camas',
+                            label: '${property.cantCamas} Habitaciones',
                           ),
                           _StatItem(
                             icon: Icons.bathtub_outlined,
                             label: '${property.cantBanios} Baños',
                           ),
+                          _StatItem(
+                            icon: Icons.directions_car_outlined,
+                            label: '${property.cantVehiculosParqueo} Vehículos',
+                          ),
                           if (property.tieneWifi)
                             const _StatItem(
                               icon: Icons.wifi_rounded,
-                              label: 'Wifi Rápido',
+                              label: 'Wifi',
                             ),
                         ],
                       ),
                     ),
-                    const SizedBox(height: 20),
-                    _HostCard(hostId: property.hostId),
+
                     const SizedBox(height: 24),
                     const Text(
                       'Acerca de este lugar',
@@ -386,45 +254,131 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
                       ),
                     ),
                     const SizedBox(height: 12),
-                    Container(
-                      height: 192,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: const Color(0xFF334155),
-                        ),
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(11),
-                        child: FlutterMap(
-                          options: MapOptions(
-                            initialCenter: LatLng(lat, lng),
-                            initialZoom: 14.0,
-                            interactionOptions: const InteractionOptions(
-                              flags: InteractiveFlag.none,
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => PropertyFullMapScreen(
+                              latitude: lat,
+                              longitude: lng,
+                              nombre: property.nombre,
                             ),
                           ),
-                          children: [
-                            TileLayer(
-                              urlTemplate:
-                                  'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
-                              subdomains: const ['a', 'b', 'c', 'd'],
-                            ),
-                            MarkerLayer(
-                              markers: [
-                                Marker(
-                                  point: LatLng(lat, lng),
-                                  width: 40,
-                                  height: 40,
-                                  child: Icon(
-                                    Icons.location_on_rounded,
-                                    color: theme.colorScheme.secondary,
-                                    size: 32,
+                        );
+                      },
+                      child: Container(
+                        height: 220,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: theme.colorScheme.outline.withValues(alpha: 0.15),
+                          ),
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(11),
+                          child: Stack(
+                            children: [
+                              FlutterMap(
+                                options: MapOptions(
+                                  initialCenter: LatLng(lat, lng),
+                                  initialZoom: 15.0,
+                                  interactionOptions: const InteractionOptions(
+                                    flags: InteractiveFlag.none,
                                   ),
                                 ),
-                              ],
-                            ),
-                          ],
+                                children: [
+                                  TileLayer(
+                                    urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                                    userAgentPackageName: 'com.mapstay.host',
+                                  ),
+                                  MarkerLayer(
+                                    markers: [
+                                      Marker(
+                                        point: LatLng(lat, lng),
+                                        width: 40,
+                                        height: 40,
+                                        child: Icon(
+                                          Icons.location_on_rounded,
+                                          color: theme.colorScheme.secondary,
+                                          size: 32,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              Positioned(
+                                top: 12,
+                                left: 12,
+                                right: 12,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                  decoration: BoxDecoration(
+                                    color: theme.colorScheme.surface.withValues(alpha: 0.9),
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(
+                                      color: theme.colorScheme.outline.withValues(alpha: 0.15),
+                                    ),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Icon(Icons.map_outlined, color: theme.colorScheme.secondary, size: 20),
+                                      const SizedBox(width: 8),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              'Ubicación Fijada',
+                                              style: theme.textTheme.labelMedium?.copyWith(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 12,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 2),
+                                            Text(
+                                              'Lat: ${lat.toStringAsFixed(6)}, Lng: ${lng.toStringAsFixed(6)}',
+                                              style: theme.textTheme.bodySmall?.copyWith(
+                                                color: theme.colorScheme.onSurfaceVariant,
+                                                fontSize: 11,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              Positioned(
+                                bottom: 12,
+                                right: 12,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color: theme.colorScheme.secondary,
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(Icons.fullscreen_rounded, size: 16, color: theme.colorScheme.onSecondary),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        'Ver Pantalla Completa',
+                                        style: TextStyle(
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.bold,
+                                          color: theme.colorScheme.onSecondary,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -457,130 +411,6 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
                   Icons.arrow_back_rounded,
                   color: Colors.white,
                   size: 22,
-                ),
-              ),
-            ),
-          ),
-          Positioned(
-            top: MediaQuery.of(context).padding.top + 8,
-            right: 16,
-            child: Row(
-              children: [
-                GestureDetector(
-                  onTap: () {
-                    MapStayToast.show(
-                      context,
-                      message: 'Enlace copiado al portapapeles',
-                      type: MapStayToastType.info,
-                    );
-                  },
-                  child: Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: Colors.black.withValues(alpha: 0.5),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.share_outlined,
-                      color: Colors.white,
-                      size: 20,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _isFavorite = !_isFavorite;
-                    });
-                    MapStayToast.show(
-                      context,
-                      message: _isFavorite
-                          ? 'Añadido a favoritos'
-                          : 'Eliminado de favoritos',
-                      type: MapStayToastType.info,
-                    );
-                  },
-                  child: Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: Colors.black.withValues(alpha: 0.5),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      _isFavorite ? Icons.favorite_rounded : Icons.favorite_border_rounded,
-                      color: _isFavorite ? Colors.redAccent : Colors.white,
-                      size: 20,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              decoration: BoxDecoration(
-                color: theme.scaffoldBackgroundColor,
-                border: const Border(
-                  top: BorderSide(color: Color(0xFF1E293B), width: 1),
-                ),
-              ),
-              child: SafeArea(
-                top: false,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        RichText(
-                          text: TextSpan(
-                            children: [
-                              TextSpan(
-                                text: '\$${property.precioNoche.toStringAsFixed(0)}',
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  color: theme.colorScheme.onSurface,
-                                  fontFamily: 'Montserrat',
-                                ),
-                              ),
-                              TextSpan(
-                                text: ' / noche',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: theme.colorScheme.onSurfaceVariant,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          '12 Oct - 15 Oct',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: theme.colorScheme.onSurfaceVariant,
-                            decoration: TextDecoration.underline,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: MapStayButton(
-                        text: 'Reservar',
-                        onPressed: () => _showReservationModal(context),
-                      ),
-                    ),
-                  ],
                 ),
               ),
             ),
@@ -624,123 +454,68 @@ class _StatItem extends StatelessWidget {
   }
 }
 
-class _HostCard extends StatelessWidget {
-  const _HostCard({required this.hostId});
 
-  final int hostId;
+
+
+
+class PropertyFullMapScreen extends StatelessWidget {
+  final double latitude;
+  final double longitude;
+  final String nombre;
+
+  const PropertyFullMapScreen({
+    super.key,
+    required this.latitude,
+    required this.longitude,
+    required this.nombre,
+  });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainer,
-        borderRadius: BorderRadius.circular(12),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          nombre,
+          style: const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            fontFamily: 'Montserrat',
+          ),
+        ),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
+        ),
+        backgroundColor: theme.colorScheme.surfaceContainer,
+        elevation: 0,
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      body: FlutterMap(
+        options: MapOptions(
+          initialCenter: LatLng(latitude, longitude),
+          initialZoom: 16.0,
+        ),
         children: [
-          Row(
-            children: [
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: const Color(0xFF334155),
-                    width: 2,
-                  ),
+          TileLayer(
+            urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+            userAgentPackageName: 'com.mapstay.host',
+          ),
+          MarkerLayer(
+            markers: [
+              Marker(
+                point: LatLng(latitude, longitude),
+                width: 48,
+                height: 48,
+                child: Icon(
+                  Icons.location_on_rounded,
+                  color: theme.colorScheme.secondary,
+                  size: 38,
                 ),
-                child: const ClipRRect(
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(22),
-                    topRight: Radius.circular(22),
-                    bottomLeft: Radius.circular(22),
-                    bottomRight: Radius.circular(22),
-                  ),
-                  child: Icon(
-                    Icons.person_outline_rounded,
-                    color: Colors.white70,
-                    size: 24,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Anfitrión #$hostId',
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'Montserrat',
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    'Superanfitrión · 5 años',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: theme.colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                ],
               ),
             ],
           ),
-          IconButton(
-            onPressed: () {
-              MapStayToast.show(
-                context,
-                message: 'Abriendo chat con el anfitrión...',
-                type: MapStayToastType.info,
-              );
-            },
-            icon: Icon(
-              Icons.chat_bubble_outline_rounded,
-              color: theme.colorScheme.secondary,
-            ),
-          ),
         ],
       ),
-    );
-  }
-}
-
-class _PriceBreakdownRow extends StatelessWidget {
-  const _PriceBreakdownRow({
-    required this.label,
-    required this.value,
-  });
-
-  final String label;
-  final String value;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 14,
-            color: theme.colorScheme.onSurfaceVariant,
-          ),
-        ),
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-            color: theme.colorScheme.onSurface,
-          ),
-        ),
-      ],
     );
   }
 }

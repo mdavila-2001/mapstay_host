@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/utils/photo_url_helper.dart';
 import '../../../domain/entities/property.dart';
 
 class PropertyCard extends StatelessWidget {
@@ -49,7 +50,7 @@ class PropertyCard extends StatelessWidget {
                           fit: BoxFit.cover,
                         )
                       : Image.network(
-                          property.firstPhoto,
+                          PhotoUrlHelper.ensureProtocol(property.firstPhoto),
                           fit: BoxFit.cover,
                           loadingBuilder: (context, child, loadingProgress) {
                             if (loadingProgress == null) return child;

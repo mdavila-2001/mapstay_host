@@ -45,6 +45,18 @@ class _MapStayImageFieldState extends State<MapStayImageField> {
   final List<MapStayImageItem> _selectedImages = [];
   final ImagePicker _picker = ImagePicker();
 
+  static final _ipPattern = RegExp(r'^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}');
+
+  static bool _isRemoteUrl(String path) {
+    return path.startsWith('http://') || path.startsWith('https://') || _ipPattern.hasMatch(path);
+  }
+
+  static String _ensureProtocol(String url) {
+    if (url.startsWith('http://') || url.startsWith('https://')) return url;
+    if (_ipPattern.hasMatch(url)) return 'http://$url';
+    return url;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -309,7 +321,7 @@ class _MapStayImageFieldState extends State<MapStayImageField> {
               }
 
               final item = _selectedImages[index];
-              final isRemote = item.previewUrl.startsWith('http://') || item.previewUrl.startsWith('https://');
+              final isRemote = _isRemoteUrl(item.previewUrl);
 
               return Stack(
                 fit: StackFit.expand,
@@ -318,7 +330,7 @@ class _MapStayImageFieldState extends State<MapStayImageField> {
                     borderRadius: BorderRadius.circular(12),
                     child: isRemote
                         ? Image.network(
-                            item.previewUrl,
+                            _ensureProtocol(item.previewUrl),
                             fit: BoxFit.cover,
                             errorBuilder: (context, error, stackTrace) {
                               return Container(

@@ -73,7 +73,15 @@ class _PropertyFormScreenState extends State<PropertyFormScreen> {
     _latitud = p?.latitud ?? '-17.7828';
     _longitud = p?.longitud ?? '-63.1806';
 
-    _selectedImages = [];
+    if (p != null && p.fotos.isNotEmpty) {
+      final ipPattern = RegExp(r'^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}');
+      _selectedImages = p.fotos
+          .where((url) => url.startsWith('http://') || url.startsWith('https://') || ipPattern.hasMatch(url))
+          .map((url) => File(url))
+          .toList();
+    } else {
+      _selectedImages = [];
+    }
   }
 
   @override

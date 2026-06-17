@@ -18,6 +18,9 @@ class Property {
   final String firstPhoto;
   final List<String> fotos;
 
+  final String? hostNombre;
+  final String? hostTelefono;
+
   Property({
     required this.id,
     required this.nombre,
@@ -37,5 +40,7 @@ class Property {
     required this.activo,
     required this.firstPhoto,
     required this.fotos,
+    this.hostNombre,
+    this.hostTelefono,
   });
 }

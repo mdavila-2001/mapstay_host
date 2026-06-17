@@ -1,4 +1,5 @@
 class Reservation {
+  final int? id;
   final int cantNoches;
   final DateTime fechaLlegada;
   final DateTime fechaSalida;
@@ -7,6 +8,7 @@ class Reservation {
   final String? lugarFoto;
 
   Reservation({
+    this.id,
     required this.cantNoches,
     required this.fechaLlegada,
     required this.fechaSalida,

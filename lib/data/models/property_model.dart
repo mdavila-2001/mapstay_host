@@ -20,6 +20,8 @@ class PropertyModel extends Property {
     required super.activo,
     required super.firstPhoto,
     required super.fotos,
+    super.hostNombre,
+    super.hostTelefono,
   });
 
   factory PropertyModel.fromJson(Map<String, dynamic> json) {
@@ -84,6 +86,10 @@ class PropertyModel extends Property {
       if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('assets/')) {
         return path;
       }
+      final domainPattern = RegExp(r'^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}');
+      if (domainPattern.hasMatch(path)) {
+        return path;
+      }
       if (path.startsWith('/')) {
         return '$domain$path';
       } else if (path.startsWith('storage/')) {
@@ -99,8 +105,8 @@ class PropertyModel extends Property {
     if (json['fotos'] != null && json['fotos'] is List) {
       for (var item in json['fotos']) {
         String p = '';
-        if (item is Map && item['foto'] != null) {
-          p = item['foto'].toString();
+        if (item is Map) {
+          p = (item['url'] ?? item['foto'] ?? '').toString();
         } else if (item is String) {
           p = item;
         }
@@ -119,6 +125,10 @@ class PropertyModel extends Property {
       parsedPhoto = 'assets/no_pic.png';
       parsedPhotos.add(parsedPhoto);
     }
+
+    final String? hostNombre = json['arrendatario']?['nombrecompleto']?.toString() ??
+        json['arrendatario']?['nombreCompleto']?.toString();
+    final String? hostTelefono = json['arrendatario']?['telefono']?.toString();
 
     return PropertyModel(
       id: json['id'] as int? ?? 0,
@@ -139,6 +149,8 @@ class PropertyModel extends Property {
       activo: isActive,
       firstPhoto: parsedPhoto,
       fotos: parsedPhotos,
+      hostNombre: hostNombre,
+      hostTelefono: hostTelefono,
     );
   }
 }

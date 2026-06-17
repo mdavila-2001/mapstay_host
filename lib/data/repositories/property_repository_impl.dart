@@ -11,13 +11,7 @@ class PropertyRepositoryImpl implements PropertyRepository {
 
   @override
   Future<List<Property>> getProperties(int hostId) async {
-
-    var response = await ApiClient.get('/lugares/arrendatario/$hostId');
-
-
-    if (response.statusCode == 404) {
-      response = await ApiClient.get('/lugar/arrendatario/$hostId');
-    }
+    final response = await ApiClient.get('/lugares/arrendatario/$hostId');
 
     if (response.statusCode == 200 || response.statusCode == 201) {
       final decoded = jsonDecode(response.body);
@@ -39,13 +33,7 @@ class PropertyRepositoryImpl implements PropertyRepository {
 
   @override
   Future<Property> createProperty(Map<String, dynamic> data) async {
-
-    var response = await ApiClient.post('/lugares', data);
-
-
-    if (response.statusCode == 404 || response.statusCode == 405) {
-      response = await ApiClient.post('/lugar', data);
-    }
+    final response = await ApiClient.post('/lugares', data);
 
     if (response.statusCode == 200 || response.statusCode == 201) {
       final decoded = jsonDecode(response.body);
@@ -70,19 +58,7 @@ class PropertyRepositoryImpl implements PropertyRepository {
   @override
   Future<Property> updateProperty(int id, Map<String, dynamic> data) async {
     final Map<String, dynamic> payload = Map.from(data)..['id'] = id;
-    
-    var response = await ApiClient.put('/lugares/$id', payload);
-
-    if (response.statusCode == 404 || response.statusCode == 405) {
-      response = await ApiClient.put('/lugar/$id', payload);
-    }
-
-    if (response.statusCode == 404 || response.statusCode == 405) {
-      response = await ApiClient.post('/lugar', payload);
-    }
-    if (response.statusCode == 404 || response.statusCode == 405) {
-      response = await ApiClient.post('/lugares', payload);
-    }
+    final response = await ApiClient.put('/lugares/$id', payload);
 
     if (response.statusCode == 200 || response.statusCode == 201) {
       final decoded = jsonDecode(response.body);
@@ -106,23 +82,12 @@ class PropertyRepositoryImpl implements PropertyRepository {
 
   @override
   Future<void> uploadPropertyPhoto(int propertyId, File photoFile) async {
-
-    var uri = Uri.parse('${ApiClient.baseUrl}/lugares/$propertyId/foto');
-    var request = http.MultipartRequest('POST', uri);
-    var multipartFile = await http.MultipartFile.fromPath('foto', photoFile.path);
+    final uri = Uri.parse('${ApiClient.baseUrl}/lugares/$propertyId/foto');
+    final request = http.MultipartRequest('POST', uri);
+    final multipartFile = await http.MultipartFile.fromPath('foto', photoFile.path);
     request.files.add(multipartFile);
-    var streamedResponse = await request.send();
-    var response = await http.Response.fromStream(streamedResponse);
-
-
-    if (response.statusCode == 404 || response.statusCode == 405) {
-      uri = Uri.parse('${ApiClient.baseUrl}/lugar/$propertyId/foto');
-      request = http.MultipartRequest('POST', uri);
-      multipartFile = await http.MultipartFile.fromPath('foto', photoFile.path);
-      request.files.add(multipartFile);
-      streamedResponse = await request.send();
-      response = await http.Response.fromStream(streamedResponse);
-    }
+    final streamedResponse = await request.send();
+    final response = await http.Response.fromStream(streamedResponse);
 
     if (response.statusCode != 200 && response.statusCode != 201) {
       final decoded = jsonDecode(response.body);

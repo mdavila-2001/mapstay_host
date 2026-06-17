@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../core/utils/photo_url_helper.dart';
 import '../../domain/entities/property.dart';
 import '../../domain/entities/reservation.dart';
 import '../providers/auth_provider.dart';
@@ -12,27 +13,28 @@ import '../widgets/mapstay_toast.dart';
 class PlaceReservationsScreen extends StatefulWidget {
   final int? propertyId;
 
-  const PlaceReservationsScreen({
-    super.key,
-    this.propertyId,
-  });
+  const PlaceReservationsScreen({super.key, this.propertyId});
 
   @override
-  State<PlaceReservationsScreen> createState() => _PlaceReservationsScreenState();
+  State<PlaceReservationsScreen> createState() =>
+      _PlaceReservationsScreenState();
 }
 
 class _PlaceReservationsScreenState extends State<PlaceReservationsScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   int? _selectedPropertyId;
-  String _selectedFilter = 'Upcoming';
+  String _selectedFilter = 'Próximas';
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      final propertyProvider = Provider.of<PropertyProvider>(context, listen: false);
-      
+      final propertyProvider = Provider.of<PropertyProvider>(
+        context,
+        listen: false,
+      );
+
       if (propertyProvider.properties.isEmpty && authProvider.userId != null) {
         propertyProvider.fetchProperties(authProvider.userId!).then((_) {
           _initializeWithProperties(propertyProvider.properties);
@@ -58,30 +60,31 @@ class _PlaceReservationsScreenState extends State<PlaceReservationsScreen> {
   }
 
   void _fetchReservations(int placeId) {
-    Provider.of<ReservationProvider>(context, listen: false)
-        .fetchReservationsByPlace(placeId)
-        .then((_) {
-          if (!mounted) return;
-          final provider = Provider.of<ReservationProvider>(context, listen: false);
-          if (provider.errorMessage != null) {
-            MapStayToast.show(
-              context,
-              message: provider.errorMessage!,
-              type: MapStayToastType.error,
-            );
-          }
-        });
+    Provider.of<ReservationProvider>(
+      context,
+      listen: false,
+    ).fetchReservationsByPlace(placeId).then((_) {
+      if (!mounted) return;
+      final provider = Provider.of<ReservationProvider>(context, listen: false);
+      if (provider.errorMessage != null) {
+        MapStayToast.show(
+          context,
+          message: provider.errorMessage!,
+          type: MapStayToastType.error,
+        );
+      }
+    });
   }
 
   List<Reservation> _getFilteredReservations(List<Reservation> reservations) {
     final now = DateTime.now();
     return reservations.where((res) {
-      if (_selectedFilter == 'Upcoming') {
-        return res.fechaLlegada.isAfter(now) || 
-            (res.fechaLlegada.year == now.year && 
-             res.fechaLlegada.month == now.month && 
-             res.fechaLlegada.day == now.day);
-      } else if (_selectedFilter == 'Past') {
+      if (_selectedFilter == 'Próximas') {
+        return res.fechaLlegada.isAfter(now) ||
+            (res.fechaLlegada.year == now.year &&
+                res.fechaLlegada.month == now.month &&
+                res.fechaLlegada.day == now.day);
+      } else if (_selectedFilter == 'Pasadas') {
         return res.fechaSalida.isBefore(now);
       } else {
         return false;
@@ -96,37 +99,41 @@ class _PlaceReservationsScreenState extends State<PlaceReservationsScreen> {
     final propertyProvider = Provider.of<PropertyProvider>(context);
     final reservationProvider = Provider.of<ReservationProvider>(context);
 
-    final currentProperty = propertyProvider.properties.firstWhere(
-      (p) => p.id == _selectedPropertyId,
-      orElse: () => Property(
-        id: 0,
-        nombre: 'Select a Property',
-        descripcion: '',
-        precioNoche: 0,
-        costoLimpieza: 0,
-        cantPersonas: 0,
-        cantCamas: 0,
-        cantBanios: 0,
-        cantHabitaciones: 0,
-        cantVehiculosParqueo: 0,
-        tieneWifi: false,
-        latitud: '',
-        longitud: '',
-        ciudad: '',
-        hostId: 0,
-        activo: false,
-        firstPhoto: '',
-        fotos: [],
-      ),
-    );
+    final currentProperty = propertyProvider.properties
+        .cast<Property>()
+        .firstWhere(
+          (p) => p.id == _selectedPropertyId,
+          orElse: () => Property(
+            id: 0,
+            nombre: 'Elegir lugar',
+            descripcion: '',
+            precioNoche: 0,
+            costoLimpieza: 0,
+            cantPersonas: 0,
+            cantCamas: 0,
+            cantBanios: 0,
+            cantHabitaciones: 0,
+            cantVehiculosParqueo: 0,
+            tieneWifi: false,
+            latitud: '',
+            longitud: '',
+            ciudad: '',
+            hostId: 0,
+            activo: false,
+            firstPhoto: '',
+            fotos: [],
+          ),
+        );
 
-    final filteredList = _getFilteredReservations(reservationProvider.reservations);
+    final filteredList = _getFilteredReservations(
+      reservationProvider.reservations,
+    );
 
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: MapStayAppBar(
-        title: 'Manage Bookings',
+        title: 'Ver Reservas Recibidas',
         isBackButton: widget.propertyId != null,
         onMenuPressed: () {
           if (widget.propertyId != null) {
@@ -163,13 +170,20 @@ class _PlaceReservationsScreenState extends State<PlaceReservationsScreen> {
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 16.0,
+              vertical: 20.0,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                if (widget.propertyId == null && propertyProvider.properties.isNotEmpty) ...[
+                if (widget.propertyId == null &&
+                    propertyProvider.properties.isNotEmpty) ...[
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: theme.colorScheme.surfaceContainer,
                       borderRadius: BorderRadius.circular(12),
@@ -197,15 +211,23 @@ class _PlaceReservationsScreenState extends State<PlaceReservationsScreen> {
                                   child: SizedBox(
                                     width: 32,
                                     height: 32,
-                                    child: property.firstPhoto.startsWith('assets/')
-                                        ? Image.asset(property.firstPhoto, fit: BoxFit.cover)
-                                        : Image.network(
+                                    child:
+                                        property.firstPhoto.startsWith(
+                                          'assets/',
+                                        )
+                                        ? Image.asset(
                                             property.firstPhoto,
                                             fit: BoxFit.cover,
-                                            errorBuilder: (context, error, stackTrace) => Image.asset(
-                                              'assets/no_pic.png',
-                                              fit: BoxFit.cover,
-                                            ),
+                                          )
+                                        : Image.network(
+                                            PhotoUrlHelper.ensureProtocol(property.firstPhoto),
+                                            fit: BoxFit.cover,
+                                            errorBuilder:
+                                                (context, error, stackTrace) =>
+                                                    Image.asset(
+                                                      'assets/no_pic.png',
+                                                      fit: BoxFit.cover,
+                                                    ),
                                           ),
                                   ),
                                 ),
@@ -242,7 +264,9 @@ class _PlaceReservationsScreenState extends State<PlaceReservationsScreen> {
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: Row(
-                    children: ['Upcoming', 'Past', 'Cancelled'].map((filter) {
+                    children: ['Próximas', 'Pasadas', 'Canceladas'].map((
+                      filter,
+                    ) {
                       final isActive = _selectedFilter == filter;
                       return Padding(
                         padding: const EdgeInsets.only(right: 8.0),
@@ -254,7 +278,10 @@ class _PlaceReservationsScreenState extends State<PlaceReservationsScreen> {
                           },
                           borderRadius: BorderRadius.circular(20),
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 10,
+                            ),
                             decoration: BoxDecoration(
                               color: isActive
                                   ? theme.colorScheme.surfaceContainerHigh
@@ -272,7 +299,9 @@ class _PlaceReservationsScreenState extends State<PlaceReservationsScreen> {
                               style: TextStyle(
                                 fontFamily: 'Inter',
                                 fontSize: 14,
-                                fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
+                                fontWeight: isActive
+                                    ? FontWeight.w600
+                                    : FontWeight.w500,
                                 color: isActive
                                     ? theme.colorScheme.onSurface
                                     : theme.colorScheme.onSurfaceVariant,
@@ -290,8 +319,10 @@ class _PlaceReservationsScreenState extends State<PlaceReservationsScreen> {
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     itemCount: 2,
-                    separatorBuilder: (context, index) => const SizedBox(height: 16),
-                    itemBuilder: (context, index) => const _BookingSkeletonCard(),
+                    separatorBuilder: (context, index) =>
+                        const SizedBox(height: 16),
+                    itemBuilder: (context, index) =>
+                        const _BookingSkeletonCard(),
                   )
                 else if (filteredList.isEmpty)
                   _buildEmptyState(theme)
@@ -335,7 +366,7 @@ class _PlaceReservationsScreenState extends State<PlaceReservationsScreen> {
           ),
           const SizedBox(height: 16),
           const Text(
-            'No Bookings Found',
+            'Sin Reservas',
             textAlign: TextAlign.center,
             style: TextStyle(
               fontFamily: 'Montserrat',
@@ -346,7 +377,7 @@ class _PlaceReservationsScreenState extends State<PlaceReservationsScreen> {
           ),
           const SizedBox(height: 8),
           Text(
-            'This place has no reservations yet. Try adjusting your filters or date range.',
+            'Este lugar no tiene reservas todavia. Intenta ajustar los filtros o el rango de fechas.',
             textAlign: TextAlign.center,
             style: TextStyle(
               fontFamily: 'Inter',
@@ -364,15 +395,22 @@ class _BookingCard extends StatelessWidget {
   final Reservation reservation;
   final String propertyName;
 
-  const _BookingCard({
-    required this.reservation,
-    required this.propertyName,
-  });
+  const _BookingCard({required this.reservation, required this.propertyName});
 
   String _formatMonthDay(DateTime dt) {
     const months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+      'Ene',
+      'Feb',
+      'Mar',
+      'Abr',
+      'May',
+      'Jun',
+      'Jul',
+      'Ago',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dic',
     ];
     return '${months[dt.month - 1]} ${dt.day.toString().padLeft(2, '0')}';
   }
@@ -388,15 +426,29 @@ class _BookingCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final bookingId = '#BK-${(reservation.fechaLlegada.millisecondsSinceEpoch ~/ 10000) % 10000}';
+    final bookingId = 'BK-${reservation.id ?? ""}';
 
-    final checkInTime = reservation.fechaLlegada.hour == 0 && reservation.fechaLlegada.minute == 0
+    final checkInTime =
+        reservation.fechaLlegada.hour == 0 &&
+            reservation.fechaLlegada.minute == 0
         ? '3:00 PM'
         : _formatTime(reservation.fechaLlegada);
 
-    final checkOutTime = reservation.fechaSalida.hour == 0 && reservation.fechaSalida.minute == 0
+    final checkOutTime =
+        reservation.fechaSalida.hour == 0 && reservation.fechaSalida.minute == 0
         ? '11:00 AM'
         : _formatTime(reservation.fechaSalida);
+
+    final computedNights = DateTime(
+      reservation.fechaSalida.year,
+      reservation.fechaSalida.month,
+      reservation.fechaSalida.day,
+    ).difference(DateTime(
+      reservation.fechaLlegada.year,
+      reservation.fechaLlegada.month,
+      reservation.fechaLlegada.day,
+    )).inDays;
+    final nights = computedNights > 0 ? computedNights : 1;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
@@ -414,24 +466,6 @@ class _BookingCard extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: SizedBox(
-                  width: 64,
-                  height: 64,
-                  child: reservation.lugarFoto != null && reservation.lugarFoto!.startsWith('assets/')
-                      ? Image.asset(reservation.lugarFoto!, fit: BoxFit.cover)
-                      : Image.network(
-                          reservation.lugarFoto ?? '',
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) => Image.asset(
-                            'assets/no_pic.png',
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                ),
-              ),
-              const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -481,7 +515,7 @@ class _BookingCard extends StatelessWidget {
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      '${reservation.cantNoches} nights',
+                      '${reservation.cantNoches} noches',
                       style: TextStyle(
                         fontFamily: 'Montserrat',
                         fontSize: 12,
@@ -510,10 +544,7 @@ class _BookingCard extends StatelessWidget {
                 Positioned(
                   left: 48,
                   right: 48,
-                  child: Container(
-                    height: 2,
-                    color: const Color(0xFF334155),
-                  ),
+                  child: Container(height: 2, color: const Color(0xFF334155)),
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -523,7 +554,7 @@ class _BookingCard extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'ARRIVAL',
+                            'LLEGADA',
                             style: TextStyle(
                               fontFamily: 'Inter',
                               fontSize: 10,
@@ -576,7 +607,7 @@ class _BookingCard extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Text(
-                            'DEPARTURE',
+                            'SALIDA',
                             style: TextStyle(
                               fontFamily: 'Inter',
                               fontSize: 10,
@@ -614,35 +645,8 @@ class _BookingCard extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              TextButton.icon(
-                onPressed: () {
-                  MapStayToast.show(
-                    context,
-                    message: 'Mensaje enviado a ${reservation.nombreCliente}',
-                    type: MapStayToastType.info,
-                  );
-                },
-                icon: Icon(
-                  Icons.chat_bubble_outline_rounded,
-                  size: 18,
-                  color: theme.colorScheme.onSurfaceVariant,
-                ),
-                label: Text(
-                  'Message Guest',
-                  style: TextStyle(
-                    fontFamily: 'Inter',
-                    fontSize: 14,
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                ),
-                style: TextButton.styleFrom(
-                  padding: EdgeInsets.zero,
-                  minimumSize: Size.zero,
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                ),
-              ),
               Text(
                 '\$${reservation.precioTotal.toStringAsFixed(2)}',
                 style: TextStyle(
@@ -669,9 +673,7 @@ class _BookingSkeletonCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: const Color(0xFF1E293B),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: Colors.white10,
-        ),
+        border: Border.all(color: Colors.white10),
       ),
       padding: const EdgeInsets.all(16),
       child: Column(

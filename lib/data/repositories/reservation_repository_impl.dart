@@ -11,11 +11,7 @@ class ReservationRepositoryImpl implements ReservationRepository {
 
   @override
   Future<List<Reservation>> getReservationsByPlace(int placeId) async {
-    var response = await apiClient.getRequest('/reservas/lugar/$placeId');
-
-    if (response.statusCode == 404 || response.statusCode == 405) {
-      response = await apiClient.getRequest('/reserva/lugar/$placeId');
-    }
+    final response = await apiClient.getRequest('/reservas/lugar/$placeId');
 
     if (response.statusCode == 200 || response.statusCode == 201) {
       final decoded = jsonDecode(response.body);
